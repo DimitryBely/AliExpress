@@ -38,14 +38,73 @@ window.addEventListener('DOMContentLoaded', () => {
 
             cartWrapper.appendChild(item);
             if(empty) {
-                empty.remove();
+                empty.style.display = 'none';
             }
 
-            let price = +products[i].querySelector('.goods__price > span').innerHTML;
-            totalCost.innerHTML = +totalCost.innerHTML + price;
+            let price = +products[i].querySelector('.goods__price > span').textContent;
+            totalCost.textContent += price;
 
-            badge.innerHTML++;
+            showConfirm();
+
+            removeItem();
+            calcGoods(1);
+            calcTotal();
         });
     });
+
+    function sliceTitle() {
+        titles.forEach(function(item){
+            if(item.textContent.length > 70){
+                item.textContent = item.textContent.slice(0, 71) + '...';
+            }
+        });
+    }
+    sliceTitle();
+
+    function showConfirm() {
+        confirm.style.display = 'block';
+        let counter = 100;
+        const interval = setInterval(frame, 5);
+        function frame() {
+            if(counter == 10){
+                clearInterval(interval);
+                confirm.style.display = 'none';
+            } else {
+                counter--;
+                confirm.style.transform = `translateY(-${counter}px)`;
+                confirm.style.opacity = `0.${counter}`;
+            }
+        }
+    }
+
+    function calcGoods(i) {
+        const items = cartWrapper.querySelectorAll('.goods__item');
+        badge.textContent = items.length;
+    }
+
+    function calcTotal() {
+        const prices = document.querySelectorAll('.cart__wrapper > .goods__item > .goods__price > span');
+        let total = 0;
+        prices.forEach(function(item) {
+            total += +item.textContent;
+        });
+        totalCost.textContent = total;
+    }
+
+    function removeItem() {
+        const removeBtn = cartWrapper.querySelectorAll('.goods__item-remove');
+        removeBtn.forEach(function(btn) {
+            btn.addEventListener('click', () => {
+                btn.parentElement.remove();
+
+                calcGoods(-1);
+                calcTotal();
+
+                if(badge.textContent == 0){
+                    cartWrapper.querySelector('.empty').style.display = 'block';
+                }
+            });
+        });
+    }
 });
 
